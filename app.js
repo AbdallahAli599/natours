@@ -11,6 +11,7 @@ const helmet = require('helmet');
 // const mongoSanitize = require('express-mongo-sanitize');
 // const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api', limiter);
 
 // Body parser, reading data from body into req.body
 app.use(express.json());
+app.use(cookieParser());
 
 // this two is making a problem with postman  ///////////////////////
 
@@ -61,6 +63,13 @@ app.use(
     ],
   })
 );
+
+// Test middleware
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  console.log(req.cookies);
+  next();
+});
 
 // Routes
 app.use('/', viewRouter);
