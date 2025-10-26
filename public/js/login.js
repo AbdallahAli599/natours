@@ -31,7 +31,7 @@ const logout = async () => {
 
     if (res.ok) {
       window.setTimeout(() => {
-        location.reload(true);
+        location.assign('/');
       }, 100);
     } else {
       alert('Error logging out. Please try again.');
