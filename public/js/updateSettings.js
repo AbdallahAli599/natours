@@ -5,14 +5,31 @@ const updateSettings = async (data, type) => {
         ? '/api/v1/users/updateMyPassword'
         : '/api/v1/users/updateMe';
 
-    const res = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    let options;
 
+    if (type === 'data' && data.photo) {
+      // use FormData for data updates with photo
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      formData.append('photo', data.photo);
+
+      options = {
+        method: 'PATCH',
+        body: formData,
+      };
+    } else {
+      // use JSON for password updates or data without photo
+      options = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      };
+    }
+
+    const res = await fetch(url, options);
     const resData = await res.json();
 
     if (res.ok) {
@@ -35,8 +52,9 @@ document
 
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
+    const photo = document.getElementById('photo').files[0];
 
-    await updateSettings({ name, email }, 'data');
+    await updateSettings({ name, email, photo }, 'data');
   });
 
 document
