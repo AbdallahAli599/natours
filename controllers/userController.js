@@ -33,16 +33,23 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single('photo');
 
-exports.resizeUserPhoto = (req, res, next) => {
-  if (!req.file) return next();
+exports.resizeUserPhoto = async (req, res, next) => {
+  try {
+    if (!req.file) return next();
 
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/users/${req.file.filename}`);
+  } catch (err) {
+    return res.status(400).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
   next();
 };
 
