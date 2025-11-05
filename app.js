@@ -5,8 +5,10 @@ const morgan = require('morgan');
 const tourRouter = require('./routes/tourRouts');
 const userRouter = require('./routes/userRouts');
 const reviewRouter = require('./routes/reviewRouts');
+const bookingRouter = require('./routes/bookingRouts');
 const viewRouter = require('./routes/viewRoutes');
 const rateLimit = require('express-rate-limit');
+
 const helmet = require('helmet');
 // const mongoSanitize = require('express-mongo-sanitize');
 // const xss = require('xss-clean');
@@ -23,7 +25,40 @@ app.set('views', path.join(__dirname, 'views'));
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 // Set security HTTP headers
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        'https://js.stripe.com',
+        'https://api.mapbox.com',
+        'https://cdnjs.cloudflare.com',
+      ],
+      frameSrc: ["'self'", 'https://js.stripe.com'],
+      connectSrc: [
+        "'self'",
+        'https://api.stripe.com',
+        'https://api.mapbox.com',
+        'https://events.mapbox.com',
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        'https://api.mapbox.com',
+        'https://fonts.googleapis.com',
+      ],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc: [
+        "'self'",
+        'data:',
+        'blob:',
+        'https://api.mapbox.com',
+        'https://events.mapbox.com',
+      ],
+    },
+  })
+);
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
@@ -76,6 +111,7 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // app.all('*', (req, res, next) => {
 //   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
