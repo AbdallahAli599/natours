@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
+const Booking = require('../models/bookingModel');
 
 exports.getOverview = async (req, res, next) => {
   try {
@@ -85,6 +86,25 @@ exports.updateUserData = async (req, res, next) => {
     res.status(200).render('account', {
       title: 'Your account',
       user: updatedUser,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 400));
+  }
+};
+
+exports.getMyTours = async (req, res, next) => {
+  try {
+    // 1) Find all bookings
+    const bookings = await Booking.find({ user: req.user.id });
+
+    // 2) Find tours with the returned IDs
+    const tourIDs = bookings.map((el) => el.tour);
+    const tours = await Tour.find({ _id: { $in: tourIDs } });
+
+    // 3) Render template
+    res.status(200).render('overview', {
+      title: 'My Tours',
+      tours,
     });
   } catch (err) {
     return next(new AppError(err.message, 400));
