@@ -70,7 +70,7 @@ exports.getAccount = (req, res, next) => {
 
 exports.updateUserData = async (req, res, next) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       {
